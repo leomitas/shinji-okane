@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// 1. Bloco do Gerador: Diz ao Prisma para criar o cliente TypeScript
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 2. Bloco da Fonte de Dados: Aponta para o seu banco de dados no arquivo .env
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Seu modelo de transação vem depois
+model Transaction {
+  id                String    @id @default(uuid())
+  description       String
+  amount            Float
+  category          String
+  transactionDate   DateTime
+  isInstallment     Boolean
+  installmentNumber Int?
+  totalInstallments Int?
+  purchaseId        String?
+  isRecurring       Boolean
+  recurringId       String?
+  createdAt         DateTime  @default(now())
+}
