@@ -132,7 +132,7 @@ const Summary: React.FC<{ transactions: Transaction[] }> = ({
     },
   };
   return (
-    <div className="md:col-span-2 bg-white p-6 rounded-2xl shadow-lg h-fit">
+    <div className="bg-white p-6 rounded-2xl shadow-lg h-fit">
       <h2 className="text-xl font-semibold mb-4 text-center">Resumo do Mês</h2>
       <div className="relative w-full h-64 sm:h-72 mx-auto">
         {transactions.length > 0 ? (
@@ -260,8 +260,8 @@ export default function ExpenseTracker() {
   );
 
   return (
-    <main className="grid grid-cols-1 md:grid-cols-5 gap-8">
-      <div className="md:col-span-3 bg-white p-6 rounded-2xl shadow-lg">
+    <main className="flex flex-col md:flex-row gap-8">
+      <div className="w-full md:w-3/5 bg-white p-6 rounded-2xl shadow-lg">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -363,8 +363,7 @@ export default function ExpenseTracker() {
           </div>
         </div>
       </div>
-      {/* O componente Summary agora é envolvido por uma div que controla o seu posicionamento no grid */}
-      <div className="md:col-span-2">
+      <div className="w-full md:w-2/5">
         <Summary transactions={transactionsForMonth} />
       </div>
     </main>
