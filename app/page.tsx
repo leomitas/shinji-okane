@@ -9,7 +9,7 @@ export default function HomePage() {
             Analista de Despesas com IA
           </h1>
           <p className="text-gray-600 mt-2">
-            Controle suas despesas e preveja suas faturas futuras!
+            Controle as suas despesas e preveja as suas faturas futuras!
           </p>
         </header>
         <ExpenseTracker />

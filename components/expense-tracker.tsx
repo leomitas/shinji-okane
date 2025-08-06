@@ -343,7 +343,7 @@ export default function ExpenseTracker() {
           <div className="space-y-3 min-h-[100px]">
             {isLoading ? (
               <p className="text-center text-gray-500 pt-8">
-                Carregando transações...
+                A carregar transações...
               </p>
             ) : error ? (
               <p className="text-center text-red-500 pt-8">{error}</p>
@@ -363,7 +363,10 @@ export default function ExpenseTracker() {
           </div>
         </div>
       </div>
-      <Summary transactions={transactionsForMonth} />
+      {/* O componente Summary agora é envolvido por uma div que controla o seu posicionamento no grid */}
+      <div className="md:col-span-2">
+        <Summary transactions={transactionsForMonth} />
+      </div>
     </main>
   );
 }
