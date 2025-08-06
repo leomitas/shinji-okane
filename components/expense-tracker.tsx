@@ -22,60 +22,61 @@ const ExpenseItem: React.FC<{
     categoryConfig[transaction.category as Category] ||
     categoryConfig["Outros"];
   return (
-    <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border animate-[fadeIn_0.3s_ease-out_forwards]">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col items-center justify-between bg-gray-50 p-3 rounded-lg border animate-[fadeIn_0.3s_ease-out_forwards] gap-2">
+      <p className="font-semibold">
         <span className="text-2xl">
           {transaction.isRecurring ? "🔄" : config.icon}
         </span>
-        <div>
-          <p className="font-semibold">
-            {transaction.description}
-            {transaction.isInstallment && (
-              <span className="text-xs text-gray-500 ml-1">
-                ({transaction.installmentNumber}/{transaction.totalInstallments}
-                )
-              </span>
-            )}
-          </p>
-          <div className="flex items-center gap-2">
-            <span
-              className="text-sm font-medium text-white px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: config.color }}
-            >
-              {transaction.category}
-            </span>
-            <span className="text-xs text-gray-400">
-              {new Date(transaction.createdAt).toLocaleDateString("pt-BR")}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center gap-3">
-        <p className="font-bold text-lg">
-          {transaction.amount.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          })}
-        </p>
-        <button
-          onClick={() => onDelete(transaction)}
-          className="text-gray-400 hover:text-red-500 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+        {transaction.description}
+        {transaction.isInstallment && (
+          <span className="text-xs text-gray-500 ml-1">
+            ({transaction.installmentNumber}/{transaction.totalInstallments})
+          </span>
+        )}
+      </p>
+      <div className="flex justify-between items-center w-full">
+        <div className="flex items-center gap-1">
+          <span
+            className="text-sm font-medium text-white px-2 py-0.5 rounded-full"
+            style={{ backgroundColor: config.color }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-        </button>
+            {transaction.category}
+          </span>
+          <span className="text-xs text-gray-400">
+            {new Date(transaction.createdAt).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "2-digit",
+            })}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <p className="font-bold text-lg">
+            {transaction.amount.toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            })}
+          </p>
+          <button
+            onClick={() => onDelete(transaction)}
+            className="text-gray-400 hover:text-red-500 transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );
