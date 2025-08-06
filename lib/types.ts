@@ -11,6 +11,7 @@ export type Category =
   | "Educação"
   | "Saúde"
   | "Compras"
+  | "Assinaturas"
   | "Outros";
 
 export const categoryConfig: Record<Category, { color: string; icon: string }> =
@@ -22,5 +23,6 @@ export const categoryConfig: Record<Category, { color: string; icon: string }> =
     Educação: { color: "#818CF8", icon: "📚" },
     Saúde: { color: "#A78BFA", icon: "❤️" },
     Compras: { color: "#FB923C", icon: "🛒" },
+    Assinaturas: { color: "#F472B6", icon: "💳" },
     Outros: { color: "#A3A3A3", icon: "⚙️" },
   };

@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  TooltipItem,
+} from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { Transaction, Category, categoryConfig } from "@/lib/types";
 
@@ -108,7 +114,7 @@ const Summary: React.FC<{ transactions: Transaction[] }> = ({
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => {
+          label: (context: TooltipItem<"doughnut">) => {
             let label = context.label || "";
             if (label) {
               label += ": ";
@@ -165,7 +171,6 @@ export default function ExpenseTracker() {
     try {
       const response = await fetch("/api/transactions");
       if (!response.ok) {
-        // Tratamento de erro robusto
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
           const errData = await response.json();
@@ -178,8 +183,12 @@ export default function ExpenseTracker() {
       }
       const data: Transaction[] = await response.json();
       setAllTransactions(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocorreu um erro desconhecido.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -205,8 +214,12 @@ export default function ExpenseTracker() {
       }
       setInputValue("");
       await fetchTransactions();
-    } catch (error: any) {
-      setError(error.message || "Não consegui entender o gasto.");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Não consegui entender o gasto.");
+      }
     } finally {
       setIsMutating(false);
     }
@@ -310,7 +323,7 @@ export default function ExpenseTracker() {
           <div className="flex justify-between items-center mb-4">
             <button
               onClick={() => changeMonth(-1)}
-              className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 transition cursor-pointer"
+              className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 transition"
             >
               &lt;
             </button>
@@ -322,7 +335,7 @@ export default function ExpenseTracker() {
             </h2>
             <button
               onClick={() => changeMonth(1)}
-              className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 transition cursor-pointer"
+              className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 transition"
             >
               &gt;
             </button>

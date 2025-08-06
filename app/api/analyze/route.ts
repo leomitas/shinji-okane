@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { categoryConfig } from "@/lib/types";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY || "";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const allowedCategories = Object.keys(categoryConfig);
 
     const payload = {
       contents: [
@@ -21,9 +23,11 @@ export async function POST(request: NextRequest) {
               text: `Analise o texto da despesa e extraia as informações em JSON.
               - Se for uma nova compra parcelada (ex: "TV em 10x de R$300"), defina "isInstallment": true, "totalInstallments": 10, "amount" (valor da parcela): 300, e "currentInstallment": 1.
               - Se for uma compra parcelada já em andamento (ex: "passagem 4/10 R$150"), defina "isInstallment": true, "currentInstallment": 4, "totalInstallments": 10, e "amount" (valor da parcela): 150.
-              - Se for uma despesa recorrente (ex: "assinatura Netflix R$55"), defina "isRecurring": true, e "amount" com o valor mensal.
+              - Se for uma despesa recorrente (ex: "assinatura Netflix R$55"), defina "isRecurring": true, e "amount" com o valor mensal. Use a categoria "Assinaturas" para este tipo.
               - Se não for nenhum dos dois, "isInstallment" e "isRecurring" devem ser false, e "amount" o valor total.
-              - Categorias permitidas: Alimentação, Transporte, Lazer, Moradia, Educação, Saúde, Compras, Outros. Texto: "${prompt}"`,
+              - Categorias permitidas: ${allowedCategories.join(
+                ", "
+              )}. Texto: "${prompt}"`,
             },
           ],
         },
@@ -35,19 +39,7 @@ export async function POST(request: NextRequest) {
           properties: {
             description: { type: "STRING" },
             amount: { type: "NUMBER" },
-            category: {
-              type: "STRING",
-              enum: [
-                "Alimentação",
-                "Transporte",
-                "Lazer",
-                "Moradia",
-                "Educação",
-                "Saúde",
-                "Compras",
-                "Outros",
-              ],
-            },
+            category: { type: "STRING", enum: allowedCategories },
             isInstallment: { type: "BOOLEAN" },
             currentInstallment: { type: "NUMBER" },
             totalInstallments: { type: "NUMBER" },
@@ -137,11 +129,10 @@ export async function POST(request: NextRequest) {
       success: true,
       message: "Transações criadas com sucesso!",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Erro na rota /api/analyze:", error);
-    return NextResponse.json(
-      { error: error.message || "Erro interno no servidor." },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Erro interno no servidor.";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
