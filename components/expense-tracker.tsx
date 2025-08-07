@@ -364,7 +364,7 @@ export default function ExpenseTracker() {
           </div>
         </div>
       </div>
-      <div className="w-full md:w-2/5">
+      <div className="w-full md:w-2/5 order-first md:order-last">
         <Summary transactions={transactionsForMonth} />
       </div>
     </main>
