@@ -1,19 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { categoryConfig } from "@/lib/types";
+import { NextRequest, NextResponse } from "next/server"
+import prisma from "@/lib/prisma"
+import { categoryConfig } from "@/lib/types"
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = await request.json();
+    const { prompt } = await request.json()
     if (!prompt)
-      return NextResponse.json(
-        { error: "Prompt is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Prompt is required" }, { status: 400 })
 
-    const apiKey = process.env.GEMINI_API_KEY || "";
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-    const allowedCategories = Object.keys(categoryConfig);
+    const apiKey = process.env.GEMINI_API_KEY || ""
+
+    // CORREÇÃO: Alterado de gemini-2.5-flash-preview-05-20 para gemini-1.5-flash
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
+
+    const allowedCategories = Object.keys(categoryConfig)
 
     const payload = {
       contents: [
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
               - Se for uma despesa recorrente (ex: "assinatura Netflix R$55"), defina "isRecurring": true, e "amount" com o valor mensal. Use a categoria "Assinaturas" para este tipo.
               - Se não for nenhum dos dois, "isInstallment" e "isRecurring" devem ser false, e "amount" o valor total.
               - Categorias permitidas: ${allowedCategories.join(
-                ", "
+                ", ",
               )}. Texto: "${prompt}"`,
             },
           ],
@@ -48,37 +48,38 @@ export async function POST(request: NextRequest) {
           required: ["description", "amount", "category"],
         },
       },
-    };
+    }
 
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-    });
+    })
+
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText = await response.text()
       throw new Error(
-        `API Error: ${response.status} ${response.statusText} - ${errorText}`
-      );
+        `API Error: ${response.status} ${response.statusText} - ${errorText}`,
+      )
     }
 
-    const result = await response.json();
+    const result = await response.json()
     const aiResult = JSON.parse(
-      result.candidates?.[0]?.content?.parts?.[0]?.text
-    );
-    if (!aiResult) throw new Error("Resposta inválida da IA.");
+      result.candidates?.[0]?.content?.parts?.[0]?.text,
+    )
+    if (!aiResult) throw new Error("Resposta inválida da IA.")
 
-    const purchaseId = crypto.randomUUID();
-    const recurringId = crypto.randomUUID();
-    const newTransactionsData = [];
+    const purchaseId = crypto.randomUUID()
+    const recurringId = crypto.randomUUID()
+    const newTransactionsData = []
 
     if (aiResult.isInstallment && aiResult.totalInstallments > 0) {
-      const startingInstallment = aiResult.currentInstallment || 1;
+      const startingInstallment = aiResult.currentInstallment || 1
       for (let i = startingInstallment; i <= aiResult.totalInstallments; i++) {
-        const transactionDate = new Date();
+        const transactionDate = new Date()
         transactionDate.setMonth(
-          transactionDate.getMonth() + (i - startingInstallment)
-        );
+          transactionDate.getMonth() + (i - startingInstallment),
+        )
         newTransactionsData.push({
           ...aiResult,
           amount: aiResult.amount,
@@ -86,18 +87,18 @@ export async function POST(request: NextRequest) {
           installmentNumber: i,
           purchaseId,
           isRecurring: false,
-        });
+        })
       }
     } else if (aiResult.isRecurring) {
       for (let i = 0; i < 12; i++) {
-        const transactionDate = new Date();
-        transactionDate.setMonth(transactionDate.getMonth() + i);
+        const transactionDate = new Date()
+        transactionDate.setMonth(transactionDate.getMonth() + i)
         newTransactionsData.push({
           ...aiResult,
           transactionDate,
           recurringId,
           isInstallment: false,
-        });
+        })
       }
     } else {
       newTransactionsData.push({
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
         transactionDate: new Date(),
         isInstallment: false,
         isRecurring: false,
-      });
+      })
     }
 
     const transactionsToCreate = newTransactionsData.map((t) => ({
@@ -119,20 +120,20 @@ export async function POST(request: NextRequest) {
       purchaseId: t.purchaseId,
       isRecurring: !!t.isRecurring,
       recurringId: t.recurringId,
-    }));
+    }))
 
     await prisma.transaction.createMany({
       data: transactionsToCreate,
-    });
+    })
 
     return NextResponse.json({
       success: true,
       message: "Transações criadas com sucesso!",
-    });
+    })
   } catch (error) {
-    console.error("Erro na rota /api/analyze:", error);
+    console.error("Erro na rota /api/analyze:", error)
     const errorMessage =
-      error instanceof Error ? error.message : "Erro interno no servidor.";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+      error instanceof Error ? error.message : "Erro interno no servidor."
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
