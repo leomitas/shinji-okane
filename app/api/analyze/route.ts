@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY || ""
 
-    // ATUALIZAÇÃO CRÍTICA: Mudança para a API v1 estável e modelo gemini-2.5-flash (versão de 2026)
+    // URL utilizando a API v1 estável e o modelo gemini-2.5-flash
     const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`
 
     const allowedCategories = Object.keys(categoryConfig)
@@ -32,9 +32,10 @@ export async function POST(request: NextRequest) {
           ],
         },
       ],
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: {
+      // CORREÇÃO: Chaves alteradas para snake_case conforme exigido pela API REST v1
+      generation_config: {
+        response_mime_type: "application/json",
+        response_schema: {
           type: "OBJECT",
           properties: {
             description: { type: "STRING" },
