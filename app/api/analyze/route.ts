@@ -32,10 +32,10 @@ export async function POST(request: NextRequest) {
           ],
         },
       ],
-      // CORREÇÃO: Chaves alteradas para snake_case conforme exigido pela API REST v1
-      generation_config: {
-        response_mime_type: "application/json",
-        response_schema: {
+      // CORREÇÃO FINAL: Revertido para camelCase (padrão esperado pela API REST v1)
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
           type: "OBJECT",
           properties: {
             description: { type: "STRING" },
