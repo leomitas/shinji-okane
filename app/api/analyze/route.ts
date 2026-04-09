@@ -10,8 +10,8 @@ export async function POST(request: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY || ""
 
-    // CORREÇÃO: Alterado de gemini-2.5-flash-preview-05-20 para gemini-1.5-flash
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
+    // URL atualizada para o modelo gemini-2.5-flash-preview-09-2025
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`
 
     const allowedCategories = Object.keys(categoryConfig)
 
